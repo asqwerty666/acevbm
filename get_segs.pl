@@ -22,7 +22,7 @@ my $ilist;
 while (@ARGV and $ARGV[0] =~ /^-/) {
 	$_ = shift;
 	last if /^--$/;
-	if (/^-o/) {$odir = shift; chomp $idir;}
+	if (/^-o/) {$odir = shift; chomp $odir;}
 	if (/^-i/) {$ilist = shift; chomp $ilist;}
 }
 
@@ -37,12 +37,31 @@ while (<IDF>) {
 	my ($sid, $fsid) = /(.*),(.*)/;
 	my $tdir = tempdir( CLEANUP => 1);
 	my $cwdir = getcwd();
-	$wdir = $cwdir.'/working';
+	my $wdir = $cwdir.'/working';
 	unless (-d $wdir) {mkdir $wdir;}
 	my $order = $cwdir.'/get_aseg.sh '.$fsid.' '.$sid.' '.$tdir;
 	system($order);
+	my $imlist = $ENV{'FSLDIR'}.'/bin/fslmaths ';
+	my $first = 1;
 	foreach my $roi (@gmluts){
+		$imlist .= ($first?' ':' -add ').$tdir.'/'.$sid.'_'.$roi.'.nii.gz';
+		$first = 0;
 		$order = $cwdir.'/get_lut.sh '.$sid.' '.$tdir.' '.$roi;
 		system($order);
 	}
+	$order = $imlist.' '.$wdir.'/'.$sid.'_GM.nii.gz';
+	print "$order\n";
+	system($order);
+        $imlist = $ENV{'FSLDIR'}.'/bin/fslmaths ';
+	$first = 1;
+        foreach my $roi (@wmluts){
+                $imlist .= ($first?' ':' -add ').$tdir.'/'.$sid.'_'.$roi.'.nii.gz';
+		$first = 0;
+                $order = $cwdir.'/get_lut.sh '.$sid.' '.$tdir.' '.$roi;
+                system($order);
+        }
+        $order = $imlist.' '.$wdir.'/'.$sid.'_WM.nii.gz';
+	system($order);
 }
+close IDF;
+
