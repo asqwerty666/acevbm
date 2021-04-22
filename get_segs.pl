@@ -31,14 +31,15 @@ die "Should supply file list\n" unless $ilist;
 
 my @gmluts = (3, 10, 11, 12, 13, 17, 18, 26, 42, 49, 50, 51, 52, 53, 54, 58);
 my @wmluts = (2, 16, 28, 41, 60, 77, 85, 251, 252, 253, 254, 255);
-
+my %subjects;
+my $cwdir = getcwd();
+my $wdir = $cwdir.'/working';
+unless (-d $wdir) {mkdir $wdir;}
 open IDF, "<$ilist" or die "Could not open file\n";
 while (<IDF>) {
 	my ($sid, $fsid) = /(.*),(.*)/;
+	$subjects{$sid} = $fsid;
 	my $tdir = tempdir( CLEANUP => 1);
-	my $cwdir = getcwd();
-	my $wdir = $cwdir.'/working';
-	unless (-d $wdir) {mkdir $wdir;}
 	my $order = $cwdir.'/get_aseg.sh '.$fsid.' '.$sid.' '.$tdir;
 	system($order);
 	my $imlist = $ENV{'FSLDIR'}.'/bin/fslmaths ';
@@ -64,4 +65,37 @@ while (<IDF>) {
 	system($order);
 }
 close IDF;
+my $tmp = tempdir( CLEANUP => 1);
+my @twm; my @tgm;
+my $seg_file = 'seg_files.csv';
+my $flist = $wdir.'/'.$seg_file;
+open TPF,">$flist" or die "$!\n";
+foreach my $sid (sort keys %subjects){
+	my $order = $ENV{'ANTS_PATH'}.'/antsRegistrationSyNQuick.sh -d 3 -f '.$ENV{'FSLDIR'}.'/data/standard/MNI152_T1_2mm.nii.gz -m '.$wdir.'/'.$sid.'_GM.nii.gz -t a -o '.$tmp.'/'.$sid.'_GM_init_';
+	system($order);
+	$order = $ENV{'ANTS_PATH'}.'/antsApplyTransforms -d 3 -r '.$ENV{'FSLDIR'}.'/data/standard/MNI152_T1_2mm.nii.gz -i '.$wdir.'/'.$sid.'_GM.nii.gz -t '.$tmp.'/'.$sid.'_GM_init_0GenericAffine.mat -o '.$tmp.'/'.$sid.'_GM0.nii.gz';
+	system($order);
+	push @tgm, $tmp.'/'.$sid.'_GM0.nii.gz';
+        $order = $ENV{'ANTS_PATH'}.'/antsRegistrationSyNQuick.sh -d 3 -f '.$ENV{'FSLDIR'}.'/data/standard/MNI152_T1_2mm.nii.gz -m '.$wdir.'/'.$sid.'_WM.nii.gz -t a -o '.$tmp.'/'.$sid.'_WM_init_';
+        system($order);
+        $order = $ENV{'ANTS_PATH'}.'/antsApplyTransforms -d 3 -r '.$ENV{'FSLDIR'}.'/data/standard/MNI152_T1_2mm.nii.gz -i '.$wdir.'/'.$sid.'_WM.nii.gz -t '.$tmp.'/'.$sid.'_WM_init_0GenericAffine.mat -o '.$tmp.'/'.$sid.'_WM0.nii.gz';
+        system($order);
+	push @twm, $tmp.'/'.$sid.'_WM0.nii.gz';
+	print TPF $wdir.'/'.$sid.'_GM.nii.gz,'.$wdir.'/'.$sid.'_WM.nii.gz'."\n";
+}
+close TPF;
+my $aux = join ' ',@tgm;
+my $order = $ENV{'FSLDIR'}.'/bin/fslmerge -t '.$tmp.'/GM0template.nii.gz '.$aux;
+system($order);
+$order = $ENV{'FSLDIR'}.'/bin/fslmaths '.$tmp.'/GM0template.nii.gz '.$tmp.'/avg_GM.nii.gz';
+system($order);
+$aux = join ' ',@twm;
+$order = $ENV{'FSLDIR'}.'/bin/fslmerge -t '.$tmp.'/WM0template.nii.gz '.$aux;
+system($order);
+$order = $ENV{'FSLDIR'}.'/bin/fslmaths '.$tmp.'/WM0template.nii.gz '.$tmp.'/avg_WM.nii.gz';
+system($order);
+$order = 'cd '.$wdir.';'.$ENV{'ANTS_PATH'}.'/antsMultivariateTemplateConstruction2.sh -d 3 -a 0 -b 0 -c 5 -u 1:0:0 -e 1 -g 0.25 -i 4 -k 2 -w 1x1 -q 70x50x30x10 -f 6x4x2x1 -s 3x2x1x0 -n 0 -o antsTPL_ -r 0 -l 1 -m CC -t SyN -y 0 -z '.$tmp.'/avg_GM.nii.gz -z '.$tmp.'/avg_WM.nii.gz '.$seg_file;
+print "$order\n";
+system($order);
+
 
