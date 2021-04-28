@@ -10,8 +10,11 @@ I need my own VBM pipeline because,
 
 ### Dependencies
 
-- File::Temp
-- File::Find::Rule
-- Cwd
-- File::Basename
+- FSL
+- ANTs
+- Perl modules
+  - File::Temp
+  - File::Find::Rule
+  - Cwd
+  - File::Basename
 
