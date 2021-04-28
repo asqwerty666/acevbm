@@ -14,7 +14,11 @@
 
 use strict; use warnings;
 use File::Temp qw(tempdir);
+use File::Find::Rule;
 use Cwd qw(getcwd);
+use SLURM qw(send2slurm);
+use File::Basename qw(basename);
+use Data::Dump qw(dump);
 my $odir;
 my $ilist;
 
@@ -40,14 +44,14 @@ while (<IDF>) {
 	my ($sid, $fsid) = /(.*),(.*)/;
 	$subjects{$sid} = $fsid;
 	my $tdir = tempdir( CLEANUP => 1);
-	my $order = $cwdir.'/get_aseg.sh '.$fsid.' '.$sid.' '.$tdir;
+	my $order = $ENV{'PIPEDIR'}.'/bin/get_fsaseg.sh '.$fsid.' '.$sid.' '.$tdir;
 	system($order);
 	my $imlist = $ENV{'FSLDIR'}.'/bin/fslmaths ';
 	my $first = 1;
 	foreach my $roi (@gmluts){
 		$imlist .= ($first?' ':' -add ').$tdir.'/'.$sid.'_'.$roi.'.nii.gz';
 		$first = 0;
-		$order = $cwdir.'/get_lut.sh '.$sid.' '.$tdir.' '.$roi;
+		$order = $ENV{'PIPEDIR'}.'/bin/get_lut.sh '.$sid.' '.$tdir.' '.$roi;
 		system($order);
 	}
 	$order = $imlist.' '.$wdir.'/'.$sid.'_GM.nii.gz';
@@ -58,7 +62,7 @@ while (<IDF>) {
         foreach my $roi (@wmluts){
                 $imlist .= ($first?' ':' -add ').$tdir.'/'.$sid.'_'.$roi.'.nii.gz';
 		$first = 0;
-                $order = $cwdir.'/get_lut.sh '.$sid.' '.$tdir.' '.$roi;
+                $order = $ENV{'PIPEDIR'}.'/bin/get_lut.sh '.$sid.' '.$tdir.' '.$roi;
                 system($order);
         }
         $order = $imlist.' '.$wdir.'/'.$sid.'_WM.nii.gz';
@@ -97,5 +101,33 @@ system($order);
 $order = 'cd '.$wdir.';'.$ENV{'ANTS_PATH'}.'/antsMultivariateTemplateConstruction2.sh -d 3 -a 0 -b 0 -c 5 -u 1:0:0 -e 1 -g 0.25 -i 4 -k 2 -w 1x1 -q 70x50x30x10 -f 6x4x2x1 -s 3x2x1x0 -n 0 -o antsTPL_ -r 0 -l 1 -m CC -t SyN -y 0 -z '.$tmp.'/avg_GM.nii.gz -z '.$tmp.'/avg_WM.nii.gz '.$seg_file;
 print "$order\n";
 system($order);
+foreach my $sid (sort keys %subjects){
+	my $order = $ENV{'ANTS_PATH'}.'/antsApplyTransforms -d 3 -i '.$wdir.'/'.$sid.'_GM.nii.gz -r '.$wdir.'/antsTPL_template0.nii.gz -o '.$wdir.'/'.$sid.'_fulltransf.nii.gz -t '.$wdir.'/antsTPL_'.$sid.'_GM*1Warp.nii.gz -t '.$wdir.'/antsTPL_'.$sid.'_GM*0GenericAffine.mat --float || true';
+	print "$order\n";
+	system($order);
+	$order = $ENV{'ANTS_PATH'}.'/CreateJacobianDeterminantImage 3 '.$wdir.'/antsTPL_'.$sid.'_fulltransf.nii.gz '.$wdir.'/'.$sid.'_jacobian.nii.gz 0 1 || true';
+	print "$order\n";
+	system($order);
+	$order = $ENV{'FSLDIR'}.'/bin/fslmaths '.$wdir.'/'.$sid.'_fulltransf.nii.gz -mul '.$wdir.'/'.$sid.'_jacobian.nii.gz '.$wdir.'/'.$sid.'_GM2temp_mod';
+	print "$order\n";
+	system($order);
+}
+my @regoks = find(file => 'name' => "*_fulltransf.nii.gz", in => $wdir);
+my @fsums;
+my $nomodsums = join ' ', @regoks;
+(my $modsums = $nomodsums) =~ s/fulltransf/GM2temp_mod/g;
+my $statsdir = $cwdir.'/stats';
+unless (-d $statsdir) {mkdir $statsdir;}
+$order = $ENV{'FSLDIR'}.'/bin/fslmerge -t '.$statsdir.'/GM_merg '.$nomodsums;
+print "$order\n";
+system($order);
+$order = $ENV{'FSLDIR'}.'/bin/fslmerge -t '.$statsdir.'/GM_mod_merg '.$modsums;
+print "$order\n";
+system($order);
+foreach my $regok (@regoks){
+	$regok = basename $regok;
+	$regok =~ s/(.*)_.*/$1/;
+	print "$regok\n";
+}
 
 
