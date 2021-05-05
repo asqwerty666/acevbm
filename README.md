@@ -10,7 +10,7 @@ I need my own VBM pipeline because,
 
 ### Dependencies
 
-- SLURM
+- SLURM :-D
 - FSL
 - ANTs
 - Perl modules
