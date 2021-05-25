@@ -146,12 +146,12 @@ foreach my $sid (sort keys %subjects){
 	my $order = $ENV{'ANTS_PATH'}.'/antsApplyTransforms -d 3 -i '.$wdir.'/'.$sid.'_GM.nii.gz -r '.$wdir.'/antsTPL_template0.nii.gz -o '.$wdir.'/'.$sid.'_fulltransf.nii.gz -t '.$wdir.'/antsTPL_'.$sid.'_GM*1Warp.nii.gz -t '.$wdir.'/antsTPL_'.$sid.'_GM*0GenericAffine.mat --float || true';
 	#print "$order\n";
 	system($order);
-	$order = $ENV{'FSLDIR'}.'/bin/flirt -in '.$wdir.'/'.$sid.'_fulltransf.nii.gz -ref '.$ENV{'PIPEDIR'}.'/lib/avg_gray_inMNI.nii.gz -applyxfm -init '.$wdir.'/ants_tpl2MNI.mat -out '.$wdir.'/'.$sid.'_fulltransf_inMNI.nii.gz';
+	$order = $ENV{'FSLDIR'}.'/bin/flirt -in '.$wdir.'/'.$sid.'_fulltransf.nii.gz -ref '.$ENV{'PIPEDIR'}.'/lib/avg_gray_inMNI.nii.gz -applyxfm -init '.$wdir.'/ants_tpl2MNI.mat -out '.$wdir.'/'.$sid.'_fulltransf_inMNI.nii.gz || true';
 	system($order);
 	$order = $ENV{'ANTS_PATH'}.'/CreateJacobianDeterminantImage 3 '.$wdir.'/'.$sid.'_fulltransf_inMNI.nii.gz '.$wdir.'/'.$sid.'_jacobian.nii.gz 0 1 || true';
 	#print "$order\n";
 	system($order);
-	$order = $ENV{'FSLDIR'}.'/bin/fslmaths '.$wdir.'/'.$sid.'_fulltransf_inMNI.nii.gz -mul '.$wdir.'/'.$sid.'_jacobian.nii.gz '.$wdir.'/'.$sid.'_GM2temp_mod';
+	$order = $ENV{'FSLDIR'}.'/bin/fslmaths '.$wdir.'/'.$sid.'_fulltransf_inMNI.nii.gz -mul '.$wdir.'/'.$sid.'_jacobian.nii.gz '.$wdir.'/'.$sid.'_GM2temp_mod || true';
 	#print "$order\n";
 	system($order);
 }
@@ -171,7 +171,7 @@ system($order);
 open ROF,">niceregister.list";
 foreach my $regok (@regoks){
 	$regok = basename $regok;
-	$regok =~ s/(.*)_.*/$1/;
+	$regok =~ s/(.*)_fulltransf_inMNI.*/$1/;
 	print ROF "$regok\n";
 }
 close ROF;
