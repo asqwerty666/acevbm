@@ -165,6 +165,8 @@ unless (-d $statsdir) {mkdir $statsdir;}
 $order = $ENV{'FSLDIR'}.'/bin/fslmerge -t '.$statsdir.'/GM_merg '.$nomodsums;
 #print "$order\n";
 system($order);
+$order = $ENV{'FSLDIR'}.'/bin/fslmaths '.$statsdir.'/GM_merg -Tmean -thr 0.01 -bin '.$statsdir.'/GM_mask -odt char';
+system($order);
 $order = $ENV{'FSLDIR'}.'/bin/fslmerge -t '.$statsdir.'/GM_mod_merg '.$modsums;
 #print "$order\n";
 system($order);
