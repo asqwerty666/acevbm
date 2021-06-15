@@ -16,6 +16,7 @@ using ANTs script *antsMultivariateTemplateConstruction2.sh*. I tried to mimick 
 ### Dependencies
 
 - SLURM :-D
+- Freesurfer
 - FSL
 - ANTs
 - Perl modules
