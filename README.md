@@ -31,4 +31,4 @@ This is built on top of SLURM but I think the Worload Manager could be changed w
 
 First, you need to define the BASH variable **$PIPEDIR**, pointing to wherever your pipeline is. Then the shell and perl scripts should be copied into **$PIPEDIR/bin/** and the standard gray template file (*avg_gray_inMNI.nii.gz*) into **$PIPEDIR/lib/**. Also the *SLURM.pm* file need to be copied into a place where it can be found by your Perl environment.
 
-and That's all Folks!
+and *That's all Folks!*
