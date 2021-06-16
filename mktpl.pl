@@ -19,6 +19,9 @@ use Cwd qw(getcwd);
 use SLURM qw(send2slurm);
 use File::Basename qw(basename);
 use Data::Dump qw(dump);
+######## extra SLURM options #########
+my $slurm_mods = '#SBATCH -c 8';
+######################################
 my $odir;
 my $ilist;
 @ARGV = ("-h") unless @ARGV;
@@ -139,7 +142,7 @@ my $order = $ENV{'ANTS_PATH'}.'/waitForSlurmJobs.pl 0 120 '.$mjob;
 system($order);
 
 #$order = 'cd '.$wdir.';'.$ENV{'ANTS_PATH'}.'/antsMultivariateTemplateConstruction2.sh -d 3 -a 0 -b 0 -c 5 -e 1 -g 0.25 -i 4 -j 5 -k 2 -w 1x1 -q 70x50x30x10 -f 6x4x2x1 -s 3x2x1x0 -n 0 -o antsTPL_ -r 0 -l 1 -m CC -t SyN -y 0 -z '.$tmp.'/avg_GM.nii.gz -z '.$tmp.'/avg_WM.nii.gz '.$seg_file;
-$order = 'cd '.$wdir.';'.$ENV{'ANTS_PATH'}.'/antsMultivariateTemplateConstruction2.sh -d 3 -c 5 -g 0.2 -i 4 -j 5 -k 1 -w 1 -q 100x70x50x10 -f 8x4x2x1 -s 3x2x1x0 -n 1 -o antsTPL_ -r 1 -l 1 -m CC -t SyN -y 0 -z '.$tmp.'/avg_GM.nii.gz '.$seg_file.';'.$ENV{'FSLDIR'}.'/bin/flirt -in '.$wdir.'/antsTPL_template0.nii.gz -ref '.$ENV{'PIPEDIR'}.'/lib/avg_gray_inMNI.nii.gz -out '.$wdir.'/antsTPL_template0_inMNI.nii.gz -omat '.$wdir.'/ants_tpl2MNI.mat';
+$order = 'cd '.$wdir.';'.$ENV{'ANTS_PATH'}.'/antsMultivariateTemplateConstruction2.sh -d 3 -c 5 -g 0.2 -i 4 -j 5 -k 1 -w 1 -q 100x70x50x10 -f 8x4x2x1 -s 3x2x1x0 -n 1 -o antsTPL_ -r 1 -l 1 -m CC -t SyN -y 0 -p "'.$slurm_mods.'" -z '.$tmp.'/avg_GM.nii.gz '.$seg_file.';'.$ENV{'FSLDIR'}.'/bin/flirt -in '.$wdir.'/antsTPL_template0.nii.gz -ref '.$ENV{'PIPEDIR'}.'/lib/avg_gray_inMNI.nii.gz -out '.$wdir.'/antsTPL_template0_inMNI.nii.gz -omat '.$wdir.'/ants_tpl2MNI.mat';
 #print "$order\n";
 system($order);
 foreach my $sid (sort keys %subjects){
