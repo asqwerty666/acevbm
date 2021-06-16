@@ -13,7 +13,7 @@ I need my own VBM pipeline because,
 Basically it takes the Freesurfer segmentation of every experiment and construct the gray matter (GM) from it. Then take the GM images and construct a template 
 using ANTs script *antsMultivariateTemplateConstruction2.sh*. I tried to mimick the FSL name conventions so I can run *randomise* command in the same way at the end.
 
-This is built on top of SLURM but I think the Worload Manager could be changed without any trouble if needed. Anyway, this is written with heavy paralelization and it is not intended to be ran into a single machine or similar environment
+This is built on top of SLURM but I think the Workload Manager could be changed without any trouble if needed. Anyway, this is written with heavy paralelization and it is not intended to be ran into a single machine or similar environment
 
 ### Dependencies
 
@@ -32,3 +32,19 @@ This is built on top of SLURM but I think the Worload Manager could be changed w
 First, you need to define the BASH variable **$PIPEDIR**, pointing to wherever your pipeline is. Then the shell and perl scripts should be copied into **$PIPEDIR/bin/** and the standard gray template file (*avg_gray_inMNI.nii.gz*) into **$PIPEDIR/lib/**. Also the *SLURM.pm* file need to be copied into a place where it can be found by your Perl environment.
 
 and *That's all Folks!*
+
+### How to run
+
+Basically you need a comma separated paired list of subject's IDs and Freesurfer's IDs. Something like,
+
+0001,bert
+0002,murphy
+0003,lena
+
+where *bert*, *murphy* and *lena* are the subjets located at Freesurfer *$SUBJECTDIR* and *0001*, *0002*, *0003* are whatever IDs you want to give it here.
+
+Now, just run,
+
+$ mktpl.pl -i mylist.csv -o outputdir
+
+
