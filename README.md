@@ -37,14 +37,18 @@ and *That's all Folks!*
 
 Basically you need a comma separated paired list of subject's IDs and Freesurfer's IDs. Something like,
 
-0001,bert
-0002,murphy
-0003,lena
 
-where *bert*, *murphy* and *lena* are the subjets located at Freesurfer *$SUBJECTDIR* and *0001*, *0002*, *0003* are whatever IDs you want to give it here.
+0001,bert \
+0002,murphy \
+0003,lena \
+...
+
+
+where *bert*, *murphy* and *lena* are the subjects located at Freesurfer *$SUBJECTDIR* and *0001*, *0002*, *0003* are whatever IDs you want to give it here.
 
 Now, just run,
 
-$ mktpl.pl -i mylist.csv -o outputdir
+$ `mktpl.pl -i mylist.csv -o outputdir`
+
 
 
