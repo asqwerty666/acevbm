@@ -11,9 +11,9 @@ I need my own VBM pipeline because,
 ### What it does?
 
 Basically it takes the Freesurfer segmentation of every experiment and construct the gray matter (GM) from it. Then take the GM images and construct a template 
-using ANTs script *antsMultivariateTemplateConstruction2.sh*. I tried to mimick the FSL name conventions so I can run *randomise* command in the same way at the end.
+using ANTs script *antsMultivariateTemplateConstruction2.sh*. This last was sligthly modified in order to allow a better control of SLURM jobs, using the *-p* (prepend) switch and *#SBATCH* directives. I tried to mimick the FSL name conventions so I can run *randomise* command in the same way at the end.
 
-This is built on top of SLURM but I think the Workload Manager could be changed without any trouble if needed. Anyway, this is written with heavy paralelization and it is not intended to be ran into a single machine or similar environment
+This is built on top of SLURM but I think the Workload Manager could be changed without any trouble if needed. Anyway, this is written with heavy paralelization and it is not intended to be ran into a single machine or similar environment.
 
 ### Dependencies
 
@@ -50,5 +50,4 @@ Now, just run,
 
 $ `mktpl.pl -i mylist.csv -o outputdir`
 
-
-
+all the intermediate files will be stored into *outputdir* but the final templates will be in a new *stats* directory. this way we organize final results similar to the known FSLVBM scripts.
