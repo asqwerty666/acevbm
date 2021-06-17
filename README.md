@@ -50,4 +50,4 @@ Now, just run,
 
 $ `mktpl.pl -i mylist.csv -o outputdir`
 
-all the intermediate files will be stored into *outputdir* but the final templates will be in a new *stats* directory. this way we organize final results similar to the known FSLVBM scripts.
+all the intermediate files will be stored into *outputdir* but the final templates will be in a new *stats* directory. So, final results get organized in a similar way to the known FSLVBM scripts would do.
