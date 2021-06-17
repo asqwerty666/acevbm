@@ -48,11 +48,15 @@ where *bert*, *murphy* and *lena* are the subjects located at Freesurfer *$SUBJE
 
 Now, just run,
 
-$ `mktpl.pl -i mylist.csv -o outputdir`
+`$ mktpl.pl -i mylist.csv -o outputdir`
 
 all the intermediate files will be stored into *outputdir* but the final templates will be in a new *stats* directory. So, final results get organized in a similar way to the known FSLVBM scripts would do.
 
-After the script finish you will be able to execute FSL's *randomise* command as usual.
+After the script finish you will be able to execute FSL's *randomise* command as usual. something like,
+
+`$ fslmaths stats/GM_mod_merg.nii.gz -s 3.0 stats/GM_mod_merg_s3.nii.gz` \
+`$ randomise -i stats/GM_merg_s3.nii.gz -m stats/GM_mask.nii.gz -o stats/mem_vbm_s3 -d design.mat -t design.con -T -n 5000`
+
 
 ### Some useful links
 
