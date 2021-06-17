@@ -52,4 +52,4 @@ $ `mktpl.pl -i mylist.csv -o outputdir`
 
 all the intermediate files will be stored into *outputdir* but the final templates will be in a new *stats* directory. So, final results get organized in a similar way to the known FSLVBM scripts would do.
 
-After the script finish you will be able to execute FSL *randomise* command as usual.
+After the script finish you will be able to execute FSL's *randomise* command as usual.
