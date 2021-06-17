@@ -54,7 +54,7 @@ all the intermediate files will be stored into *outputdir* but the final templat
 
 After the script finished you will be able to execute FSL's *randomise* command as usual. Something like,
 
-`$ fslmaths stats/GM_mod_merg.nii.gz -s 3.0 stats/GM_mod_merg_s3.nii.gz` \
+`$ fslmaths stats/GM_merg.nii.gz -s 3.0 stats/GM_merg_s3.nii.gz` \
 `$ randomise -i stats/GM_merg_s3.nii.gz -m stats/GM_mask.nii.gz -o stats/mem_vbm_s3 -d design.mat -t design.con -T -n 5000`
 
 
