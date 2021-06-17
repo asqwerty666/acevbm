@@ -44,7 +44,7 @@ Basically you need a comma separated paired list of subject's IDs and Freesurfer
 ...
 
 
-where *bert*, *murphy* and *lena* are the subjects located at Freesurfer *$SUBJECTDIR* and *0001*, *0002*, *0003* are whatever IDs you want to give it here.
+where *bert*, *murphy* and *lena* are the subjects located at Freesurfer *$SUBJECTS\_DIR* and *0001*, *0002*, *0003* are whatever IDs you want to give it here.
 
 Now, just run,
 
