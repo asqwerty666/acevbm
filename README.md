@@ -56,6 +56,6 @@ After the script finish you will be able to execute FSL's *randomise* command as
 
 ### Some useful links
 
-https://gsanroma.github.io/posts/2019/01/vbm-data-preparation/
-https://ftp.nmr.mgh.harvard.edu/pub/dist/freesurfer/tutorial_packages/centos6/fsl_507/doc/wiki/FSLVBM
-https://github.com/ANTsX/ANTs
+ - https://gsanroma.github.io/posts/2019/01/vbm-data-preparation/
+ - https://ftp.nmr.mgh.harvard.edu/pub/dist/freesurfer/tutorial_packages/centos6/fsl_507/doc/wiki/FSLVBM
+ - https://github.com/ANTsX/ANTs
