@@ -23,7 +23,6 @@ use Data::Dump qw(dump);
 ######## extra SLURM options #########
 ########## for ANTs script ###########
 ######################################
-#my $slurm_mem = '32gb';
 my $slurm_mods = '#SBATCH -c 8'."\n";
 #$slurm_mods.='#SBATCH --mail-type=ALL'."\n";
 #$slurm_mods.='#SBATCH --mail-user='."$ENV{'USER'}\n";
@@ -159,7 +158,7 @@ foreach my $sid (sort keys %subjects){
 	system($order);
 	$order = $ENV{'FSLDIR'}.'/bin/flirt -in '.$wdir.'/'.$sid.'_fulltransf.nii.gz -ref '.$ENV{'PIPEDIR'}.'/lib/avg_gray_inMNI.nii.gz -applyxfm -init '.$wdir.'/ants_tpl2MNI.mat -out '.$wdir.'/'.$sid.'_fulltransf_inMNI.nii.gz || true';
 	system($order);
-	$order = $ENV{'ANTS_PATH'}.'/CreateJacobianDeterminantImage 3 '.$wdir.'/'.$sid.'_fulltransf_inMNI.nii.gz '.$wdir.'/'.$sid.'_jacobian.nii.gz 0 1 || true';
+	$order = $ENV{'ANTS_PATH'}.'/CreateJacobianDeterminantImage 3 '.$wdir.'/'.$sid.'_fulltransf_inMNI.nii.gz '.$wdir.'/'.$sid.'_jacobian.nii.gz 1 0 || true';
 	#print "$order\n";
 	system($order);
 	$order = $ENV{'FSLDIR'}.'/bin/fslmaths '.$wdir.'/'.$sid.'_fulltransf_inMNI.nii.gz -mul '.$wdir.'/'.$sid.'_jacobian.nii.gz '.$wdir.'/'.$sid.'_GM2temp_mod || true';
