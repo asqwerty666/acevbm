@@ -29,17 +29,17 @@ my $slurm_mods = '#SBATCH -c 8'."\n";
 $slurm_mods.= '#SBATCH --mem-per-cpu=4G'."\n";
 ######################################
 ######################################
-my $odir;
+#my $odir;
 my $ilist;
 @ARGV = ("-h") unless @ARGV;
 while (@ARGV and $ARGV[0] =~ /^-/) {
 	$_ = shift;
 	last if /^--$/;
-	if (/^-o/) {$odir = shift; chomp $odir;}
+	#if (/^-o/) {$odir = shift; chomp $odir;}
 	if (/^-i/) {$ilist = shift; chomp $ilist;}
 }
 
-die "Should supply output directory\n" unless $odir;
+#die "Should supply output directory\n" unless $odir;
 die "Should supply file list\n" unless $ilist;
 
 my @gmluts = (3, 10, 11, 12, 13, 17, 18, 26, 42, 49, 50, 51, 52, 53, 54, 58);
