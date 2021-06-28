@@ -156,20 +156,22 @@ foreach my $sid (sort keys %subjects){
 	my $order = $ENV{'ANTS_PATH'}.'/antsApplyTransforms -d 3 -i '.$wdir.'/'.$sid.'_GM.nii.gz -r '.$wdir.'/antsTPL_template0.nii.gz -o '.$wdir.'/'.$sid.'_fulltransf.nii.gz -t '.$wdir.'/antsTPL_'.$sid.'_GM*1Warp.nii.gz -t '.$wdir.'/antsTPL_'.$sid.'_GM*0GenericAffine.mat --float || true';
 	#print "$order\n";
 	system($order);
+        $order = $ENV{'ANTS_PATH'}.'/CreateJacobianDeterminantImage 3 '.$wdir.'/'.$sid.'_fulltransf.nii.gz '.$wdir.'/'.$sid.'_jacobian.nii.gz 1 0 || true';
+	#print "$order\n";
+        system($order);
+        $order = $ENV{'FSLDIR'}.'/bin/fslmaths '.$wdir.'/'.$sid.'_fulltransf.nii.gz -mul '.$wdir.'/'.$sid.'_jacobian.nii.gz '.$wdir.'/'.$sid.'_GM2temp_mod || true';
+	#print "$order\n";
+        system($order);
 	$order = $ENV{'FSLDIR'}.'/bin/flirt -in '.$wdir.'/'.$sid.'_fulltransf.nii.gz -ref '.$ENV{'PIPEDIR'}.'/lib/avg_gray_inMNI.nii.gz -applyxfm -init '.$wdir.'/ants_tpl2MNI.mat -out '.$wdir.'/'.$sid.'_fulltransf_inMNI.nii.gz || true';
 	system($order);
-	$order = $ENV{'ANTS_PATH'}.'/CreateJacobianDeterminantImage 3 '.$wdir.'/'.$sid.'_fulltransf_inMNI.nii.gz '.$wdir.'/'.$sid.'_jacobian.nii.gz 1 0 || true';
-	#print "$order\n";
-	system($order);
-	$order = $ENV{'FSLDIR'}.'/bin/fslmaths '.$wdir.'/'.$sid.'_fulltransf_inMNI.nii.gz -mul '.$wdir.'/'.$sid.'_jacobian.nii.gz '.$wdir.'/'.$sid.'_GM2temp_mod || true';
-	#print "$order\n";
+	$order = $ENV{'FSLDIR'}.'/bin/flirt -in '.$wdir.'/'.$sid.'_GM2temp_mod.nii.gz -ref '.$ENV{'PIPEDIR'}.'/lib/avg_gray_inMNI.nii.gz -applyxfm -init '.$wdir.'/ants_tpl2MNI.mat -out '.$wdir.'/'.$sid.'_GM2temp_mod_inMNI.nii.gz || true';
 	system($order);
 }
 my @regoks = find(file => 'name' => "*_fulltransf_inMNI.nii.gz", in => $wdir);
 @regoks = sort @regoks;
 my @fsums;
 my $nomodsums = join ' ', @regoks;
-(my $modsums = $nomodsums) =~ s/fulltransf_inMNI/GM2temp_mod/g;
+(my $modsums = $nomodsums) =~ s/fulltransf_inMNI/GM2temp_mod_inMNI/g;
 my $statsdir = $cwdir.'/stats';
 unless (-d $statsdir) {mkdir $statsdir;}
 $order = $ENV{'FSLDIR'}.'/bin/fslmerge -t '.$statsdir.'/GM_merg '.$nomodsums;
